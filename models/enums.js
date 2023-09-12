@@ -1,0 +1,5 @@
+const TOKEN_EXPIRATION_IN_HOURS = 4;
+
+module.exports = {
+	TOKEN_EXPIRATION_IN_HOURS,
+};

@@ -1,0 +1,58 @@
+version: "3.3"
+
+services:
+
+  api:
+    build:
+      context: .
+    image: chat-api
+    env_file: docker-compose.env
+    environment:
+      PORT: 3000
+    depends_on:
+      - nats
+      - redis
+    ports:
+      - 3000:3000
+    expose:
+      - 3000:3000
+    networks:
+      - internal
+
+  database:
+    image: postgis/postgis
+    restart: always
+    environment:
+      POSTGRES_DB: chat-api-dev
+      POSTGRES_PASSWORD: DMLYab@aZPSDxBCK
+    networks:
+      - internal
+    ports:
+      - 5433:5433
+    expose:
+      - 5433:5433
+    command: -p 5433
+
+  nats:
+    image: nats
+    ports:
+      - 4222:4222
+    expose:
+      - 4222:4222
+    networks:
+      - internal
+
+  redis:
+    image: redis:alpine
+    networks:
+      - internal
+    ports:
+      - 6379:6379
+    expose:
+      - 6379:6379
+
+networks:
+  internal:
+
+volumes:
+  data:
