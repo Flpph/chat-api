@@ -25,7 +25,15 @@ module.exports = {
 	 * Settings
 	 */
 	settings: {
-		fields: ["email", "name", "displayName"],
+		fields: [
+			"id",
+			"email",
+			"name",
+			"displayName",
+			"is_verified",
+			"created_at",
+			"updated_at",
+		],
 	},
 
 	/**
@@ -144,6 +152,15 @@ module.exports = {
 					user: await this.transformDocuments(ctx, {}, user),
 					authToken,
 				};
+			},
+		},
+
+		me: {
+			rest: "GET /me",
+			auth: true,
+			async handler(ctx) {
+				console.log(ctx.meta);
+				return this.transformDocuments(ctx, {}, ctx.meta.user);
 			},
 		},
 

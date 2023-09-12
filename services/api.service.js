@@ -26,11 +26,18 @@ module.exports = {
 		// Global Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 		use: [],
 
+		cors: {
+			origin: "*",
+			methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE", "PATCH"],
+			exposedHeaders: [],
+			credentials: false,
+		},
+
 		routes: [
 			{
 				path: "/api",
 
-				whitelist: ["users.register", "users.login"],
+				whitelist: ["users.register", "users.login", "users.me"],
 
 				// Route-level Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 				use: [],
@@ -39,7 +46,7 @@ module.exports = {
 				mergeParams: true,
 
 				// Enable authentication. Implement the logic into `authenticate` method. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Authentication
-				authentication: false,
+				authentication: true,
 
 				// Enable authorization. Implement the logic into `authorize` method. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Authorization
 				authorization: false,
