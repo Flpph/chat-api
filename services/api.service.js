@@ -37,7 +37,12 @@ module.exports = {
 			{
 				path: "/api",
 
-				whitelist: ["users.register", "users.login", "users.me"],
+				whitelist: [
+					"users.register",
+					"users.login",
+					"users.me",
+					"conversations.create",
+				],
 
 				// Route-level Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
 				use: [],

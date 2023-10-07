@@ -159,8 +159,9 @@ module.exports = {
 			rest: "GET /me",
 			auth: true,
 			async handler(ctx) {
-				console.log(ctx.meta);
-				return this.transformDocuments(ctx, {}, ctx.meta.user);
+				return {
+					user: await this.transformDocuments(ctx, {}, ctx.meta.user),
+				};
 			},
 		},
 
