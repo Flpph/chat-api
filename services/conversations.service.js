@@ -1,5 +1,10 @@
 "use strict";
-const { Conversation, UserConversation } = require("../models/index");
+const {
+	Conversation,
+	UserConversation,
+	User,
+	Message,
+} = require("../models/index");
 const DbMixin = require("../mixins/db.mixin");
 const SqlAdapter = require("moleculer-db-adapter-sequelize");
 const { sequelize } = require("../models/baseModel");
@@ -93,6 +98,115 @@ module.exports = {
 				});
 
 				return conversation;
+			},
+		},
+
+		getUserConversations: {
+			rest: "GET /",
+			auth: true,
+			async handler(ctx) {
+				const userConversations = await UserConversation.findAll({
+					where: { user_id: ctx.meta.user.id },
+				});
+
+				const conversations = await Conversation.findAll({
+					include: [
+						{
+							model: User,
+							as: "users",
+							attributes: ["id", "name", "displayName"],
+							through: {
+								attributes: [],
+							},
+							where: {
+								id: { [Op.ne]: ctx.meta.user.id },
+							},
+						},
+						{
+							model: Message,
+							as: "messages",
+							attributes: ["text", "created_at"],
+							order: [["created_at", "DESC"]],
+							limit: 1,
+						},
+					],
+					where: {
+						id: {
+							[Op.in]: userConversations.map(
+								(uc) => uc.conversation_id
+							),
+						},
+					},
+				});
+
+				return conversations;
+			},
+		},
+
+		sendMessage: {
+			rest: "POST /:conversation_id/message",
+			auth: true,
+			params: {
+				conversation_id: "uuid",
+				message: "string",
+				type: "string",
+			},
+			async handler(ctx) {
+				const { conversation_id, message } = ctx.params;
+				const userConversation = await UserConversation.findOne({
+					where: {
+						conversation_id,
+						user_id: ctx.meta.user.id,
+					},
+				});
+
+				if (!userConversation) {
+					throw MoleculerClientError("NO_CONVERSATION");
+				}
+
+				const createdMessage = await Message.create({
+					sender_id: ctx.meta.user.id,
+					conversation_id,
+					type: "message",
+					text: message,
+				});
+
+				return createdMessage;
+			},
+		},
+
+		getMessages: {
+			rest: "GET /:id/messages",
+			params: {},
+			async handler(ctx) {
+				const { id } = ctx.params;
+				const userConversation = await UserConversation.findOne({
+					where: {
+						conversation_id: id,
+						user_id: ctx.meta.user.id,
+					},
+				});
+
+				if (!userConversation) {
+					throw MoleculerClientError("NO_CONVERSATION");
+				}
+
+				const messages = await Message.findAll({
+					where: {
+						conversation_id: id,
+					},
+					attributes: ["id", "text", "created_at", "updated_at"],
+					order: [["created_at", "ASC"]],
+					include: [
+						{
+							model: User,
+							as: "sender",
+							attributes: ["id", "displayName"],
+						},
+					],
+				});
+
+				return messages;
 			},
 		},
 	},

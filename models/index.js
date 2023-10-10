@@ -39,6 +39,26 @@ UserConversation.belongsTo(User, {
 	as: "user",
 });
 
+Conversation.hasMany(Message, {
+	foreignKey: "conversation_id",
+	as: "messages",
+});
+
+Message.belongsTo(Conversation, {
+	foreignKey: "conversation_id",
+	as: "conversation",
+});
+
+User.hasMany(Message, {
+	foreignKey: "sender_id",
+	as: "messages",
+});
+
+Message.belongsTo(User, {
+	foreignKey: "sender_id",
+	as: "sender",
+});
+
 module.exports = {
 	User,
 	UserToken,

@@ -41,7 +41,11 @@ module.exports = {
 					"users.register",
 					"users.login",
 					"users.me",
+
 					"conversations.create",
+					"conversations.getUserConversations",
+					"conversations.sendMessage",
+					"conversations.getMessages",
 				],
 
 				// Route-level Express middlewares. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Middlewares
