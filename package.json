@@ -36,6 +36,7 @@
     "moleculer-db": "^0.8.20",
     "moleculer-db-adapter-mongo": "^0.4.15",
     "moleculer-db-adapter-sequelize": "^0.2.15",
+    "moleculer-io": "^2.2.0",
     "moleculer-web": "^0.10.4",
     "moment": "^2.29.4",
     "mysql2": "^3.6.1",
