@@ -10,7 +10,6 @@ const SqlAdapter = require("moleculer-db-adapter-sequelize");
 const { sequelize } = require("../models/baseModel");
 const bcrypt = require("bcrypt");
 const moment = require("moment");
-const hat = require("hat");
 const { TOKEN_EXPIRATION_IN_HOURS } = require("../models/enums");
 const { Op } = require("sequelize");
 const { MoleculerClientError } = require("moleculer").Errors;
@@ -164,6 +163,17 @@ module.exports = {
 					throw MoleculerClientError("NO_CONVERSATION");
 				}
 
+				const conversation = await Conversation.findOne({
+					where: { id: conversation_id },
+					include: [
+						{
+							model: User,
+							as: "users",
+							where: { id: { [Op.ne]: ctx.meta.user.id } },
+						},
+					],
+				});
+
 				const createdMessage = await Message.create({
 					sender_id: ctx.meta.user.id,
 					conversation_id,
@@ -171,7 +181,19 @@ module.exports = {
 					text: message,
 				});
 
-				return createdMessage;
+				return {
+					message: {
+						id: createdMessage.id,
+						text: createdMessage.text,
+						created_at: createdMessage.created_at,
+						updated_at: createdMessage.updated_at,
+						sender: {
+							id: ctx.meta.user.id,
+							displayName: ctx.meta.user.displayName,
+						},
+					},
+					conversationUsers: conversation.users.map((u) => u.id),
+				};
 			},
 		},
 

@@ -29,8 +29,35 @@ module.exports = {
 							let socket = this;
 							let user = socket.client.user;
 							console.log({ userName: user.name, data });
+							try {
+								const { message, conversationUsers } =
+									await socket.$service.broker.call(
+										"conversations.sendMessage",
+										{
+											conversation_id:
+												data.conversationId,
+											message: data.message,
+											type: "message",
+										},
+										{
+											meta: {
+												user,
+											},
+										}
+									);
+								ack(null, message);
 
-							ack(null, null);
+								await socket.$service.broker.call(
+									"websocket.newMessage",
+									{
+										userIds: conversationUsers,
+										conversationId: data.conversationId,
+										message,
+									}
+								);
+							} catch (e) {
+								ack(e, null);
+							}
 						},
 					},
 				},
@@ -38,21 +65,26 @@ module.exports = {
 		},
 	},
 	actions: {
-		onBidReceived: {
+		newMessage: {
 			params: {
-				offerId: "string",
-				bid: "object",
+				userIds: "array",
+				conversationId: "string",
+				message: "object",
 			},
 			async handler(ctx) {
+				const { userIds, conversationId, message } = ctx.params;
 				let socket = this;
-				this.io
-					.to(`offer_${ctx.params.offerId}`)
-					.emit("bidReceived", ctx.params.bid);
+				for (const userId of userIds) {
+					console.log("runs");
+					socket.io
+						.to(`chat_feed_${userId}`)
+						.emit("newMessage", { conversationId, message });
+				}
 			},
 		},
 	},
 	methods: {
-		async socketAuthorize(socket, handler) {
+		async socketAuthorize(socket) {
 			let authToken = socket.handshake.query["x-api-key"];
 			console.log("Login using remember token: ", authToken);
 			if (authToken) {
