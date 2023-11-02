@@ -41,6 +41,7 @@ module.exports = {
 					"users.register",
 					"users.login",
 					"users.me",
+					"users.list",
 
 					"conversations.create",
 					"conversations.getUserConversations",

@@ -45,7 +45,6 @@ module.exports = {
 	 * Actions
 	 */
 	actions: {
-		list: false,
 		get: false,
 		find: false,
 		count: false,
@@ -208,6 +207,20 @@ module.exports = {
 				if (!user) throw new MoleculerClientError("UNAUTHORIZED", 401);
 
 				return user;
+			},
+		},
+
+		list: {
+			rest: "GET /list",
+			auth: true,
+			async handler(ctx) {
+				const user = ctx.meta.user;
+
+				return this.transformDocuments(
+					ctx,
+					{},
+					await User.findAll({ where: { id: { [Op.ne]: user.id } } })
+				);
 			},
 		},
 	},
