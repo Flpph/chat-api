@@ -4,7 +4,7 @@
   "description": "My Moleculer-based microservices project",
   "scripts": {
     "dev": "moleculer-runner --repl --hot services/**/*.service.js --envfile ./.env.development",
-    "start": "moleculer-runner",
+    "start": "moleculer-runner services/**/*.service.js --envfile ./.env.development",
     "cli": "moleculer connect NATS",
     "ci": "jest --watch",
     "test": "jest --coverage",
@@ -16,10 +16,7 @@
     "generate:migration": "npx sequelize-cli migration:generate --name",
     "generate:seed": "npx sequelize-cli seed:generate --name"
   },
-  "keywords": [
-    "microservices",
-    "moleculer"
-  ],
+  "keywords": ["microservices", "moleculer"],
   "author": "",
   "devDependencies": {
     "eslint": "^8.25.0",
@@ -54,8 +51,6 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "rootDir": "./services",
-    "roots": [
-      "../test"
-    ]
+    "roots": ["../test"]
   }
 }

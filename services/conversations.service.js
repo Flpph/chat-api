@@ -151,7 +151,7 @@ module.exports = {
 				type: "string",
 			},
 			async handler(ctx) {
-				const { conversation_id, message } = ctx.params;
+				const { conversation_id, message, type } = ctx.params;
 				const userConversation = await UserConversation.findOne({
 					where: {
 						conversation_id,
@@ -177,7 +177,7 @@ module.exports = {
 				const createdMessage = await Message.create({
 					sender_id: ctx.meta.user.id,
 					conversation_id,
-					type: "message",
+					type,
 					text: message,
 				});
 
@@ -185,6 +185,7 @@ module.exports = {
 					message: {
 						id: createdMessage.id,
 						text: createdMessage.text,
+						type: createdMessage.type,
 						created_at: createdMessage.created_at,
 						updated_at: createdMessage.updated_at,
 						sender: {

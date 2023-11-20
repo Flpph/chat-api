@@ -66,7 +66,6 @@ module.exports = {
 			},
 			async handler(ctx) {
 				const { email, password, name } = ctx.params;
-
 				const existingUser = await User.findOne({
 					where: {
 						[Op.or]: [{ email }, { name }],
@@ -79,15 +78,12 @@ module.exports = {
 						"CONFLICT"
 					);
 				}
-
 				const user = {
 					email,
 					name,
 					displayName: name,
 					password: this.hashPassword(password),
 				};
-
-				// Transaction, if we need to write into multiple tables later
 				const { createdUser, authToken } = await sequelize.transaction(
 					async (transaction) => {
 						const createdUser = await User.create(user, {
@@ -104,7 +100,6 @@ module.exports = {
 						};
 					}
 				);
-
 				return {
 					createdUser: await this.transformDocuments(
 						ctx,
